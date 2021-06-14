@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class Players(BaseModel):
     idPlayer: Optional[int]
     name: str
-    posicion: str
+    position: str
     nation: str
     team: str
 
