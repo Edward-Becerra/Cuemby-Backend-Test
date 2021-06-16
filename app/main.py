@@ -16,6 +16,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
 def get_db():
     try:
         db = SessionLocal()
@@ -23,8 +24,15 @@ def get_db():
     finally:
         db.close()
 
-# Metodo Get que direcciona a la raiz
+
+# Metodo GET que direcciona a la raiz
 @app.get("/")
 def main():
     return RedirectResponse(url="/docs/")
 
+# Metodo POST : obtener jugadores de un equipo
+@app.post("/api/v1/players/", response_model=List[schemas.Players])
+async def playersList(entrada: schemas.Team, db:Session=Depends(get_db)):
+    players = db.query(models.Players).limit(10)
+    print('************************')
+    return players

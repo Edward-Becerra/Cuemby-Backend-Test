@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 
+
 class Players(BaseModel):
     idPlayer: Optional[int]
     name: str
@@ -8,15 +9,13 @@ class Players(BaseModel):
     nation: str
     team: str
 
-    class config:
-        orm_mode: True
+    class Config:
+    	orm_mode=True
+
 
 class Team(BaseModel):
     name: str
-    pages: Optional[int]
-
-    class config:
-        orm_mode: True
+    pages: Optional[int]    
 
 class ResponseTeam(BaseModel):
     Page: int
@@ -25,6 +24,5 @@ class ResponseTeam(BaseModel):
     totalItems: int
     Players: dict
 
-    class config:
-        orm_mode: True
-
+    class Config:
+    	orm_mode=True

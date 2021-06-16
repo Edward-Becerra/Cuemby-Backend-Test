@@ -10,6 +10,5 @@ class Players(Base):
     idPlayer = Column(Integer, primary_key=True, index=True)
     name = Column(String(100))
     position = Column(String(10))
-    nation  = Column(String(45))
+    nation = Column(String(45))
     team = Column(String(45))
-
