@@ -2,7 +2,7 @@ import scrapy # type: ignore
 import json
 import requests
 import mysql.connector
-
+import app.insert_db as q
 
 class FifaSpider(scrapy.Spider):
     name = "fifa"
@@ -14,46 +14,42 @@ class FifaSpider(scrapy.Spider):
         items = resp.get("items")
 
         pList = []
+        pUniqueList=[]
         playersData = []
 
         for item in items:
             players = {
+                "id_api":item.get("baseId"),
                 "name": item.get("name"),
                 "position": item.get("position"),
                 "nation": item.get("nation").get("abbrName"),
                 "team": item.get("club").get("abbrName"),
             }
             pList.append(players)
+            #print('//////////////////////////////////////////////////////////////////')
+            #print(players)
 
             for p in pList:
-                player = [p["name"], p["position"], p["nation"], p["team"]]
+                player = [p["id_api"],p["name"], p["position"], p["nation"], p["team"]]
                 playersData.append(player)
-            print(playersData)
-        # print(pList)
+            #print(type(playersData))
+            #print(playersData)
 
-        try:
-            conexion = mysql.connector.connect(
-                host="localhost", user="root", passwd="", database="cuemby_fifa21"
-            )
-            print("Conexión establecida....")
-            cursor = conexion.cursor()
-            print("Cursor creado....")
+            # print("*******************************************************")
+            # print(f"Jugadores extraídos....{len(playersData)}")
+            # print("*******************************************************")
 
-            sql = (
-                "insert into players(name,position, nation,team) values (%s,%s,%s,%s);"
-            )
-            cursor.executemany(sql, playersData)
-            print("Consulta realizada....")
-            conexion.commit()
-            print("se han insertado {0} registros.".format(len(playersData)))
-            conexion.close()
-            print("Conexión cerrada...")
-
-        except mysql - connector.Error as err:
-            print(err)
-            print(err.errno)
-            print(err.msg)
-
+            for p in range(len(playersData)-1,-1,-1):
+                if playersData[p] not in pUniqueList:
+                    pUniqueList.append(playersData[p])
+                else:
+                    playersData.remove(playersData[p])
+            # print("*******************************************************")
+            # print(f"Jugadores únicos extraídos....{len(pUniqueList)}")
+            # print("*******************************************************")
+            # print(pUniqueList)        
+        
+       
         url = "https://www.easports.com/fifa/ultimate-team/api/fut/item?page=1"
         response = requests.get(url)
 
@@ -63,5 +59,5 @@ class FifaSpider(scrapy.Spider):
                 url=f"https://www.easports.com/fifa/ultimate-team/api/fut/item?page={nextPage}",
                 callback=self.parse,
             )
+        q.InserInto(pUniqueList)
 
-        return pList

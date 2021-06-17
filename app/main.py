@@ -1,6 +1,7 @@
 # Archivo de la implemetación
 
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi_pagination import Page, add_pagination, paginate
 from starlette.responses import RedirectResponse
 from typing import List
 from . import models
@@ -10,6 +11,7 @@ from .conexion import SessionLocal, engine
 from sqlalchemy.orm import Session
 import requests
 import json
+import app.querys as q
 
 # Para obtener toda la información de los objetos mapeados.
 models.Base.metadata.create_all(bind=engine)
@@ -30,9 +32,23 @@ def get_db():
 def main():
     return RedirectResponse(url="/docs/")
 
+
 # Metodo POST : obtener jugadores de un equipo
-@app.post("/api/v1/players/", response_model=List[schemas.Players])
-async def playersList(entrada: schemas.Team, db:Session=Depends(get_db)):
-    players = db.query(models.Players).limit(10)
-    print('************************')
-    return players
+@app.post("/api/v1/team/", response_model=Page[schemas.TeamPlayers])
+async def Players_By_Team(entrada: schemas.Team):
+    team = entrada.name.title()
+    print("*********************")
+    print(team)
+    return q.findLike(team)
+
+
+# Metodo GET : obtener jugadores de un equipo
+@app.get("/api/v1/player/", response_model=Page[schemas.TeamPlayers])
+async def Player_Contain_String(entrada: schemas.Team):
+    name = entrada.name.lower()
+    print("*********************")
+    print(name)
+    return q.findName(name)
+
+
+add_pagination(app)

@@ -8,6 +8,7 @@ from .conexion import Base
 class Players(Base):
     __tablename__ = "players"
     idPlayer = Column(Integer, primary_key=True, index=True)
+    id_api = Column(Integer, unique = True)
     name = Column(String(100))
     position = Column(String(10))
     nation = Column(String(45))
